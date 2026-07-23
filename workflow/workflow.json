@@ -1,0 +1,1028 @@
+{
+  "name": "Invoice to Ledger",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1504,
+        -464
+      ],
+      "name": "Telegram Trigger",
+      "webhookId": "e46c1983-fcbf-4933-815a-099688c38624",
+      "credentials": {
+        "telegramApi": {
+          "id": "TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.photo[$json.message.photo.length - 1].file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1376,
+        400
+      ],
+      "name": "Download photo",
+      "webhookId": "404557d9-6b62-4e46-a359-bf3de735806c",
+      "credentials": {
+        "telegramApi": {
+          "id": "TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Ledger_Template",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.nama_pihak }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TANGGAL": "={{ $json.TANGGAL }}",
+            "NO SURAT": "={{ $json['NO SURAT'] }}",
+            "NAMA BARANG": "={{ $json['NAMA BARANG'] }}",
+            "JUMLAH": "={{ $json.JUMLAH }}",
+            "SATUAN": "={{ $json.SATUAN }}",
+            "HARGA / SATUAN": "={{ $json['HARGA / SATUAN'] }}",
+            "KREDIT": "={{ $json.KREDIT }}",
+            "DEBET": "={{ $json.DEBET }}",
+            "TOTAL": "={{ $json.TOTAL }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "TANGGAL",
+              "displayName": "TANGGAL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "NO SURAT",
+              "displayName": "NO SURAT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "NAMA BARANG",
+              "displayName": "NAMA BARANG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "JUMLAH",
+              "displayName": "JUMLAH",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SATUAN",
+              "displayName": "SATUAN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "HARGA / SATUAN",
+              "displayName": "HARGA / SATUAN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "KREDIT",
+              "displayName": "KREDIT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DEBET",
+              "displayName": "DEBET",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "TOTAL",
+              "displayName": "TOTAL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "nama_pihak",
+              "displayName": "nama_pihak",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -320,
+        320
+      ],
+      "name": "Append to party tab",
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const buffer = await this.helpers.getBinaryDataBuffer($itemIndex, 'data');\n\nreturn {\n  json: {\n    image_base64: buffer.toString('base64'),\n    mime_type: $input.item.binary.data.mimeType\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1232,
+        -464
+      ],
+      "name": "Encode image to base64"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"claude-opus-4-8\",\n  \"max_tokens\": 2000,\n  \"system\": \"Kamu adalah asisten admin yang membaca foto nota untuk perusahaan percetakan NORTHGATE PRINT WORKS (kode internal: NPW), berlokasi di Tangerang. Pemilik: the owner.\\n\\nBaca foto nota yang dilampirkan, lalu ekstrak informasi berikut dalam format JSON:\\n\\n{\\n  \\\"jenis\\\": \\\"HUTANG\\\" atau \\\"PIUTANG\\\",\\n  \\\"nama_pihak\\\": \\\"nama pihak lawan transaksi, atau null\\\",\\n  \\\"tanggal\\\": \\\"YYYY-MM-DD\\\",\\n  \\\"no_surat\\\": \\\"nomor nota persis seperti tertulis\\\",\\n  \\\"items\\\": [\\n    {\\n      \\\"nama_barang\\\": \\\"...\\\",\\n      \\\"jumlah\\\": angka,\\n      \\\"satuan\\\": \\\"lbr/pcs/set/kg/dll\\\",\\n      \\\"harga_satuan\\\": angka atau null,\\n      \\\"subtotal\\\": angka\\n    }\\n  ],\\n  \\\"total_nota\\\": angka,\\n  \\\"perlu_foto_ulang\\\": true atau false,\\n  \\\"alasan_kurang_jelas\\\": \\\"sebutkan field mana yang tidak terbaca, kosongkan jika lengkap\\\"\\n}\\n\\n=== ATURAN JENIS (HUTANG vs PIUTANG) ===\\nLihat segmen kedua nomor nota (dipisah tanda /).\\n- Mengandung \\\"NPW\\\" (termasuk varian \\\"NPW-P\\\") -> PIUTANG. Kami yang menerbitkan nota ke customer.\\n- Selain itu -> HUTANG. Pihak lain yang menerbitkan nota kepada kami.\\nContoh: 060032/NPW-P/VI/2026 -> PIUTANG. 060001/PPS/VI/2026 -> HUTANG.\\n\\n=== ATURAN nama_pihak ===\\nIni nama LAWAN TRANSAKSI, bukan nama kami sendiri.\\n- PIUTANG: ambil nama customer. Biasanya di kotak kanan atas nota. Bisa berupa nama perusahaan maupun nama orang.\\n- HUTANG: ambil nama penerbit nota, biasanya dari field \\\"Dari:\\\" atau kop surat penerbit.\\n\\nPENTING:\\n- NORTHGATE PRINT WORKS / NORTHGATE / NPW adalah NAMA KAMI SENDIRI. Jangan pernah dipakai sebagai nama_pihak.\\n- Pada nota HUTANG, nama kami sering muncul di kotak kanan atas sebagai penerima. Abaikan, itu bukan nama_pihak.\\n- Kalau nama lawan transaksi TIDAK TERLIHAT jelas di foto, isi null. JANGAN menebak dari nama lain yang kebetulan ada di kertas.\\n- nama_pihak bernilai null TIDAK memicu perlu_foto_ulang, karena sistem punya cadangan dari kode nota.\\n\\n=== ATURAN no_surat ===\\nFormat: 6DIGIT/KODE/ROMAWI/TAHUN. Contoh: 060043/NPW-P/VI/2026.\\n- Segmen pertama SELALU 6 digit angka, tidak pernah ada huruf.\\n- 2 digit PERTAMA dari segmen pertama adalah nomor bulan, dan HARUS sama dengan angka romawi di segmen ketiga. Contoh: romawi VI berarti 2 digit awal adalah 06. Romawi V berarti 05.\\n- Pakai aturan ini untuk mengoreksi huruf yang salah terbaca. Kalau romawi VI tapi digit awal terbaca 0S atau 05, yang benar adalah 06.\\n- Sebelum menjawab, cek ulang: apakah 2 digit awal sudah cocok dengan angka romawi? Kalau belum, perbaiki.\\n\\n=== ATURAN tanggal ===\\n- Ambil dari field tanggal di kiri atas nota, format asli DD/MM/YYYY.\\n- Keluarkan sebagai YYYY-MM-DD.\\n- JANGAN mengambil bulan dari nomor nota. Angka romawi di nomor nota sering tidak sinkron dengan tanggal sebenarnya.\\n\\n=== ATURAN ANGKA (PENTING) ===\\nNota memakai format angka Indonesia: TITIK = pemisah ribuan, KOMA = desimal.\\n- \\\"30.200\\\" berarti tiga puluh ribu dua ratus, BUKAN 30,2.\\n- \\\"5.250\\\" berarti lima ribu dua ratus lima puluh, BUKAN 5,25.\\n- \\\"145,08\\\" berarti seratus empat puluh lima koma nol delapan.\\nKeluarkan semua angka sebagai JSON polos tanpa pemisah ribuan: 30200, 5250, 145.08.\\n\\nVERIFIKASI WAJIB sebelum menjawab:\\n- Untuk SETIAP item, hitung jumlah x harga_satuan. Hasilnya HARUS sama dengan subtotal.\\n- Kalau tidak sama, berarti ada angka yang salah dibaca. Baca ulang kolom Banyaknya dan Harga untuk item itu, lalu perbaiki.\\n- Contoh: kalau subtotal 250.000 dan harga 50, maka jumlah pasti 5.000 (bukan 3.000).\\n- Jumlah semua subtotal harus sama dengan total_nota.\\n\\n=== ATURAN items ===\\n- Satu baris di tabel nota = satu objek di array items.\\n- nama_barang: salin persis, PERTAHANKAN tanda * atau x pada ukuran. Contoh \\\"31*19,5 cm\\\" jangan jadi \\\"3119,5 cm\\\". Pertahankan juga rasio seperti \\\"1:1\\\" atau \\\"1:4\\\".\\n- harga_satuan: kalau kolom harga tertulis \\\"minimum\\\" atau kosong, isi null (BUKAN 0). Ini normal dan TIDAK memicu perlu_foto_ulang selama subtotal terbaca.\\n- subtotal: ambil dari kolom Jumlah di nota, jangan dihitung sendiri.\\n- Kalau ada keterangan kuantitas seperti \\\"ket : 10 pak x 3.000 pcs + 200 pcs\\\", pakai itu untuk memastikan angka di kolom Banyaknya sudah benar.\\n\\n=== KONDISI FOTO ===\\n- Foto mungkin terbalik 180 derajat atau miring. Tetap baca dengan benar sesuai orientasi tulisan.\\n- Nota sering ditumpuk. Teks samar yang tembus dari lembar di bawahnya HARUS DIABAIKAN, jangan dimasukkan sebagai item.\\n\\n=== KAPAN perlu_foto_ulang = true ===\\nSet true HANYA jika salah satu dari ini tidak terbaca:\\n- tanggal\\n- no_surat\\n- total_nota\\n- minimal 1 item dengan nama_barang, jumlah, dan subtotal terisi\\n\\nJangan set true hanya karena nama_pihak null atau harga_satuan null.\\n\\nJangan mengarang angka. Kalau ragu antara dua angka yang mirip pada field wajib, isi null dan set perlu_foto_ulang true dengan alasan yang spesifik menyebut field dan item mana.\\n\\nPENTING: Balas HANYA dengan JSON di atas, tanpa teks pembuka, penutup, atau markdown code fence.\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"image\",\n          \"source\": {\n            \"type\": \"base64\",\n            \"media_type\": \"{{ $json.mime_type }}\",\n            \"data\": \"{{ $json.image_base64 }}\"\n          }\n        },\n        {\n          \"type\": \"text\",\n          \"text\": \"Baca foto nota ini dan ekstrak datanya sesuai format JSON yang sudah ditentukan di system prompt.\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1040,
+        400
+      ],
+      "name": "Claude Vision - extract invoice",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ANTHROPIC_CREDENTIAL_ID",
+          "name": "Anthropic API key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// ====== KONFIGURASI ======\nconst SELF = ['NORTHGATE PRINT WORKS', 'NORTHGATE', 'NPW'];\n\nconst KODE_PIHAK = {\n  // 'PPS': 'HARAPAN GEMILANG',\n};\n\nfunction norm(s) {\n  return String(s || '')\n    .toUpperCase()\n    .replace(/[:\\\\\\/\\?\\*\\[\\]]/g, ' ')\n    .replace(/\\b(PT|CV|UD|TB)\\b\\.?/g, '')\n    .replace(/\\s+/g, ' ')\n    .trim()\n    .slice(0, 90);\n}\n\n// ====== PARSE ======\nlet teks = $input.item.json.content[0].text;\nteks = teks.replace(/```json/g, '').replace(/```/g, '').trim();\nconst d = JSON.parse(teks);\n\n// ====== JENIS & NAMA PIHAK ======\nconst noSurat = String(d.no_surat || '').toUpperCase();\nconst seg = noSurat.split('/');\nconst kode = (seg[1] || '').trim();\nconst jenis = kode.includes('NPW') ? 'PIUTANG' : 'HUTANG';\n\nlet pihak = norm(d.nama_pihak);\nlet pakaiKode = false;\n\nif (!pihak || SELF.includes(pihak)) {\n  pihak = KODE_PIHAK[kode] || kode;\n  pakaiKode = !KODE_PIHAK[kode] && !!kode;\n}\n\n// ====== PERINGATAN ======\nconst peringatan = [];\n\n// 1. cek aritmatika tiap item\n(d.items || []).forEach((it, i) => {\n  if (it.harga_satuan === null || it.harga_satuan === undefined) return;\n  const j = Number(it.jumlah);\n  const h = Number(it.harga_satuan);\n  const s = Number(it.subtotal);\n  if (!isFinite(j) || !isFinite(h) || !isFinite(s)) return;\n\n  const hitung = j * h;\n  const toleransi = Math.max(5, s * 0.01);\n  if (Math.abs(hitung - s) > toleransi) {\n    peringatan.push('Item ' + (i + 1) + ': ' + j + ' x ' + h + ' = ' + hitung\n      + ', tapi nota tulis ' + s + ' (jumlah/harga kemungkinan salah baca)');\n  }\n});\n\n// 2. cek bulan di nomor nota vs angka romawi\nconst ROMAWI = { I:1, II:2, III:3, IV:4, V:5, VI:6, VII:7, VIII:8, IX:9, X:10, XI:11, XII:12 };\nconst bulanRomawi = ROMAWI[(seg[2] || '').trim()];\nconst bulanDepan = parseInt(String(seg[0] || '').slice(0, 2), 10);\nif (bulanRomawi && !isNaN(bulanDepan) && bulanRomawi !== bulanDepan) {\n  peringatan.push('No nota: 2 digit awal (' + String(seg[0]).slice(0, 2)\n    + ') tidak cocok dengan bulan ' + seg[2] + ' (' + bulanRomawi + ')');\n}\n\n// 3. cek jumlah subtotal vs total nota\nconst jmlSub = (d.items || []).reduce((a, it) => a + Number(it.subtotal || 0), 0);\nif (d.total_nota != null && jmlSub !== Number(d.total_nota)) {\n  peringatan.push('Jumlah subtotal ' + jmlSub + ' beda dgn total nota ' + d.total_nota);\n}\n\n// ====== KAPAN MINTA FOTO ULANG ======\nlet perluUlang = d.perlu_foto_ulang === true;\nlet alasan = d.alasan_kurang_jelas || 'Foto kurang jelas';\n\nif (!perluUlang && !pihak) {\n  perluUlang = true;\n  alasan = 'Nama pihak dan kode nota tidak terbaca';\n}\nif (!perluUlang && (!Array.isArray(d.items) || d.items.length === 0)) {\n  perluUlang = true;\n  alasan = 'Item nota tidak terbaca';\n}\n\n// ====== TEMPEL METADATA KE TIAP ITEM ======\nconst items = (d.items || []).map(it => ({\n  nama_barang: it.nama_barang || '',\n  jumlah: it.jumlah ?? null,\n  satuan: it.satuan || '',\n  harga_satuan: it.harga_satuan ?? null,\n  subtotal: it.subtotal ?? null,\n  tanggal: d.tanggal || '',\n  no_surat: d.no_surat || '',\n  nama_pihak: pihak,\n  jenis: jenis,\n}));\n\nreturn {\n  json: {\n    nama_pihak: pihak,\n    jenis: jenis,\n    kode: kode,\n    pakai_kode: pakaiKode,\n    no_surat: d.no_surat || '',\n    tanggal: d.tanggal || '',\n    total_nota: d.total_nota ?? null,\n    perlu_foto_ulang: perluUlang,\n    alasan: alasan,\n    peringatan: peringatan,\n    items: items,\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -896,
+        -448
+      ],
+      "name": "Parse, classify & validate"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c73d2cb5-d731-4f46-89c5-99ca299c97b4",
+              "leftValue": "={{ $json.perlu_foto_ulang }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -832,
+        384
+      ],
+      "name": "Photo readable?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{\n(() => {\n  const d = $json;\n  const bersih = (t) => String(t ?? '').replace(/\\*/g, 'x').replace(/[_`\\[\\]]/g, ' ');\n\n  return 'Foto kurang jelas, tolong foto ulang ya.\\n\\n'\n    + 'Alasan: ' + bersih(d.alasan || 'tidak disebutkan') + '\\n\\n'\n    + (d.no_surat ? 'No. Nota terbaca: ' + bersih(d.no_surat) + '\\n\\n' : '')\n    + 'Tips: nota jangan ketutup bayangan, posisi tegak (jangan kebalik), seluruh tabel masuk frame.';\n})()\n}}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -432,
+        -656
+      ],
+      "name": "Reply: retake photo",
+      "webhookId": "5efd003f-d1a3-4179-8daf-5819ccb0dfcf",
+      "credentials": {
+        "telegramApi": {
+          "id": "TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -208
+      ],
+      "name": "Split line items"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        256,
+        -208
+      ],
+      "name": "Throttle writes",
+      "webhookId": "a673bcfb-f2f5-4019-a21d-8663ce1406b1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        16,
+        320
+      ],
+      "name": "Aggregate line items"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{\n(() => {\n  const d = $('Parse, classify & validate').first().json;\n  const bersih = (t) => String(t ?? '').replace(/\\*/g, 'x').replace(/[_`\\[\\]]/g, ' ');\n  const rp = (n) => (n === null || n === undefined || n === '') ? '-' : 'Rp' + Number(n).toLocaleString('id-ID');\n  const angka = (n) => Number(n || 0).toLocaleString('id-ID');\n\n  const items = d.items || [];\n  const peringatan = d.peringatan || [];\n\n  const baris = items.map((it, i) =>\n    (i + 1) + '. ' + bersih(it.nama_barang)\n    + ' - ' + angka(it.jumlah) + ' ' + bersih(it.satuan)\n    + ' @ ' + rp(it.harga_satuan)\n    + ' = ' + rp(it.subtotal)\n  ).join('\\n');\n\n  const jml = items.reduce((a, it) => a + Number(it.subtotal || 0), 0);\n  const cocok = d.total_nota != null && jml === Number(d.total_nota);\n\n  const blokWarn = peringatan.length\n    ? '\\n\\nPERLU DICEK:\\n' + peringatan.map(p => '- ' + bersih(p)).join('\\n')\n    : '';\n\n  return 'Tercatat ke Sheets\\n\\n'\n    + 'Jenis: ' + d.jenis + '\\n'\n    + 'Pihak: ' + bersih(d.nama_pihak) + (d.pakai_kode ? '  (kode - nama belum diset)' : '') + '\\n'\n    + 'No. Nota: ' + bersih(d.no_surat) + '\\n'\n    + 'Tanggal: ' + d.tanggal + '\\n\\n'\n    + 'Item:\\n' + baris + '\\n\\n'\n    + 'Total: ' + rp(jml)\n    + (cocok ? '  (cocok dgn nota)' : '  (BEDA dgn nota: ' + rp(d.total_nota) + ')')\n    + blokWarn + '\\n\\n'\n    + 'Cek excel kalo perlu koreksi ya.';\n})()\n}}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        320
+      ],
+      "name": "Reply: confirmation",
+      "webhookId": "b6d003c4-7454-4801-99bb-e06f1d9fe84f",
+      "credentials": {
+        "telegramApi": {
+          "id": "TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "documentId": {
+          "__rl": true,
+          "value": "=YOUR_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "title": "={{ $json.nama_pihak }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -448,
+        -224
+      ],
+      "name": "Create party tab",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b2b9b80b-7722-4ccd-82b9-f33a991086fc",
+              "name": "TANGGAL",
+              "value": "={{ $json.tanggal }}",
+              "type": "string"
+            },
+            {
+              "id": "8d0234b2-ea07-4dfa-9b0a-82992265d2a5",
+              "name": "NO SURAT",
+              "value": "={{ $json.no_surat }}",
+              "type": "string"
+            },
+            {
+              "id": "24ab5273-d480-4d50-b545-024f00d3d98f",
+              "name": "NAMA BARANG",
+              "value": "={{ $json.items.nama_barang }}",
+              "type": "string"
+            },
+            {
+              "id": "7f0d32bd-ef82-4c24-9eab-a092667f2176",
+              "name": "JUMLAH",
+              "value": "={{ $json.items.jumlah }}",
+              "type": "string"
+            },
+            {
+              "id": "1f203fd4-4953-42f6-9018-fd7e08b8e803",
+              "name": "SATUAN",
+              "value": "={{ $json.items.satuan }}",
+              "type": "string"
+            },
+            {
+              "id": "dabfeaaf-fefb-4fcb-911b-1c16454d55d9",
+              "name": "HARGA / SATUAN",
+              "value": "={{ $json.items.harga_satuan }}",
+              "type": "string"
+            },
+            {
+              "id": "e5e561da-602d-4c41-85f2-0a967793b878",
+              "name": "KREDIT",
+              "value": "={{ $json.items.subtotal }}",
+              "type": "string"
+            },
+            {
+              "id": "05548dbd-ccb6-4d33-8c8a-8210d860374b",
+              "name": "DEBET",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "942507b6-1671-48a8-a0d6-ed8151b73e0d",
+              "name": "TOTAL",
+              "value": "={{ $json.items.subtotal }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "selected",
+        "includeFields": "nama_pihak, jenis",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        -208
+      ],
+      "name": "Map to ledger columns"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Parse, classify & validate').all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        -208
+      ],
+      "name": "Restore invoice data"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/YOUR_SPREADSHEET_ID/values/{{ encodeURIComponent($('Parse, classify & validate').item.json.nama_pihak) }}!A1:I1?valueInputOption=RAW",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"values\": [\n    [\"TANGGAL\", \"NO SURAT\", \"NAMA BARANG\", \"JUMLAH\", \"SATUAN\", \"HARGA / SATUAN\", \"KREDIT\", \"DEBET\", \"TOTAL\"]\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -288,
+        -448
+      ],
+      "name": "Write header (idempotent)",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Ledger_Template",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "_MASTER",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TANGGAL": "={{ $('Map to ledger columns').item.json.TANGGAL }}",
+            "JENIS": "={{ $('Map to ledger columns').item.json.jenis }}",
+            "NAMA PIHAK": "={{ $('Map to ledger columns').item.json.nama_pihak }}",
+            "NO SURAT": "={{ $('Map to ledger columns').item.json['NO SURAT'] }}",
+            "NAMA BARANG": "={{ $('Map to ledger columns').item.json['NAMA BARANG'] }}",
+            "JUMLAH": "={{ $('Map to ledger columns').item.json.JUMLAH }}",
+            "SATUAN": "={{ $('Map to ledger columns').item.json.SATUAN }}",
+            "HARGA / SATUAN": "={{ $('Map to ledger columns').item.json['HARGA / SATUAN'] }}",
+            "KREDIT": "={{ $('Map to ledger columns').item.json.KREDIT }}",
+            "DEBET": "={{ $('Map to ledger columns').item.json.DEBET }}",
+            "TOTAL": "={{ $('Map to ledger columns').item.json.TOTAL }}",
+            "WAKTU INPUT": "={{ $now.setZone('Asia/Jakarta').toFormat('yyyy-MM-dd HH:mm') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "TANGGAL",
+              "displayName": "TANGGAL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "JENIS",
+              "displayName": "JENIS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "NAMA PIHAK",
+              "displayName": "NAMA PIHAK",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "NO SURAT",
+              "displayName": "NO SURAT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "NAMA BARANG",
+              "displayName": "NAMA BARANG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "JUMLAH",
+              "displayName": "JUMLAH",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SATUAN",
+              "displayName": "SATUAN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "HARGA / SATUAN",
+              "displayName": "HARGA / SATUAN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "KREDIT",
+              "displayName": "KREDIT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DEBET",
+              "displayName": "DEBET",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "TOTAL",
+              "displayName": "TOTAL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "WAKTU INPUT",
+              "displayName": "WAKTU INPUT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -144,
+        320
+      ],
+      "name": "Append to _MASTER",
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Ledger_Template",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "_MASTER",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -800,
+        800
+      ],
+      "name": "Read _MASTER ledger",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('Parse, classify & validate').first().json;\nconst noSurat = String(data.no_surat || '').trim().toUpperCase();\n\n// kumpulin semua nomor nota yang udah ada di _MASTER\nconst sudahAda = new Set();\nfor (const item of $input.all()) {\n  const n = String(item.json['NO SURAT'] || '').trim().toUpperCase();\n  if (n) sudahAda.add(n);\n}\n\nconst duplikat = noSurat ? sudahAda.has(noSurat) : false;\n\nreturn [{\n  json: {\n    ...data,\n    duplikat: duplikat,\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        800
+      ],
+      "name": "Check invoice no."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1830d746-b83f-4fa2-ba48-0af41641af80",
+              "leftValue": "={{ $json.duplikat }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -496,
+        800
+      ],
+      "name": "Already recorded?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{\n(() => {\n  const d = $('Check invoice no.').first().json;\n  const bersih = (t) => String(t ?? '').replace(/\\*/g, 'x').replace(/[_`\\[\\]]/g, ' ');\n  return bersih('Nota ini SUDAH PERNAH dicatat, jadi tidak ditulis ulang.\\n\\n'\n    + 'No. Nota: ' + d.no_surat + '\\n'\n    + 'Pihak: ' + d.nama_pihak + '\\n\\n'\n    + 'Kalau ini memang nota berbeda, cek nomornya di Sheets tab _MASTER.');\n})()\n}}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -256,
+        576
+      ],
+      "name": "Reply: duplicate",
+      "webhookId": "d508b764-f7fe-4f40-9eb0-3699568f37ca",
+      "credentials": {
+        "telegramApi": {
+          "id": "TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download photo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download photo": {
+      "main": [
+        [
+          {
+            "node": "Encode image to base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Encode image to base64": {
+      "main": [
+        [
+          {
+            "node": "Claude Vision - extract invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Vision - extract invoice": {
+      "main": [
+        [
+          {
+            "node": "Parse, classify & validate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse, classify & validate": {
+      "main": [
+        [
+          {
+            "node": "Photo readable?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Photo readable?": {
+      "main": [
+        [
+          {
+            "node": "Reply: retake photo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Read _MASTER ledger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply: retake photo": {
+      "main": [
+        []
+      ]
+    },
+    "Split line items": {
+      "main": [
+        [
+          {
+            "node": "Throttle writes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Throttle writes": {
+      "main": [
+        [
+          {
+            "node": "Map to ledger columns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to party tab": {
+      "main": [
+        [
+          {
+            "node": "Append to _MASTER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate line items": {
+      "main": [
+        [
+          {
+            "node": "Reply: confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create party tab": {
+      "main": [
+        [
+          {
+            "node": "Write header (idempotent)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Restore invoice data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map to ledger columns": {
+      "main": [
+        [
+          {
+            "node": "Append to party tab",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restore invoice data": {
+      "main": [
+        [
+          {
+            "node": "Split line items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write header (idempotent)": {
+      "main": [
+        [
+          {
+            "node": "Restore invoice data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to _MASTER": {
+      "main": [
+        [
+          {
+            "node": "Aggregate line items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read _MASTER ledger": {
+      "main": [
+        [
+          {
+            "node": "Check invoice no.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check invoice no.": {
+      "main": [
+        [
+          {
+            "node": "Already recorded?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Already recorded?": {
+      "main": [
+        [
+          {
+            "node": "Reply: duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create party tab",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}
