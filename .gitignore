@@ -1,0 +1,10 @@
+.env
+*.local
+node_modules/
+
+# Never commit real invoice images — they contain customer names,
+# bank account details, and per-customer pricing.
+samples/private/
+*.jpg
+*.jpeg
+!docs/*.png
